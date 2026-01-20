@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>小狗逼准时宝</title>
+  <title>小狗逼准时保</title>
   
   <!-- PWA & Mobile App Settings -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="准时宝">
+  <meta name="apple-mobile-web-app-title" content="准时保">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
   
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/8002/8002150.png">
   
   <!-- Web Manifest for Android Fullscreen Support -->
-  <link rel="manifest" href="data:application/manifest+json,{'name':'小狗逼准时宝','short_name':'准时宝','start_url':'.','display':'standalone','background_color':'#000000','theme_color':'#000000','orientation':'portrait','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/8002/8002150.png','sizes':'512x512','type':'image/png'}]}">
+  <link rel="manifest" href="data:application/manifest+json,{'name':'小狗逼准时保','short_name':'准时保','start_url':'.','display':'standalone','background_color':'#000000','theme_color':'#000000','orientation':'portrait','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/8002/8002150.png','sizes':'512x512','type':'image/png'}]}">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@
       padding: 0;
       background-color: #000000;
       overflow: hidden;
-      position: fixed; /* 禁止橡皮筋回弹 */
+      position: fixed;
     }
 
     body {
@@ -60,6 +60,12 @@
     /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   </style>
 <script type="importmap">
 {
