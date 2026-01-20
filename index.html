@@ -1,27 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>小狗逼准时保</title>
+  <title>小狗逼准时保 - 在线开黑版</title>
   
-  <!-- PWA & Mobile App Settings -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="准时保">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
   
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/8002/8002150.png">
-  
-  <!-- Web Manifest for Android Fullscreen Support -->
-  <link rel="manifest" href="data:application/manifest+json,{'name':'小狗逼准时保','short_name':'准时保','start_url':'.','display':'standalone','background_color':'#000000','theme_color':'#000000','orientation':'portrait','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/8002/8002150.png','sizes':'512x512','type':'image/png'}]}">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --sat: env(safe-area-inset-top);
@@ -29,57 +22,399 @@
     }
     
     html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      background-color: #000000;
-      overflow: hidden;
-      position: fixed;
+      height: 100%; width: 100%; margin: 0; padding: 0;
+      background-color: #000000; overflow: hidden; position: fixed;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none; -webkit-user-select: none;
+      color: #f1f5f9;
     }
 
-    #root {
-      height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
+    #root { height: 100%; width: 100%; display: flex; flex-direction: column; }
     .safe-top { padding-top: var(--sat); }
     .safe-bottom { padding-bottom: var(--sab); }
-
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-    /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
+
+    @keyframes pulse-cyan {
+      0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); }
+    }
+    .animate-pulse-cyan { animation: pulse-cyan 2s infinite; }
+
+    .btn-active:active { transform: scale(0.95); transition: transform 0.1s; }
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react/": "https://esm.sh/react@^19.2.3/"
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@^19.2.3",
+      "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+      "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+      "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+      "react/": "https://esm.sh/react@^19.2.3/"
+    }
   }
-}
-</script>
+  </script>
 </head>
 <body>
   <div id="root"></div>
+
+  <script type="module">
+    import React, { useState, useEffect, useRef } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { GoogleGenAI } from "@google/genai";
+    import { 
+      Users, Timer, Skull, Zap, CheckCircle2, Volume2, VolumeX, 
+      History, Sparkles, Share2, Settings2, Plus, Edit2, 
+      BellRing, Trash2, ArrowRight, Clock, Globe, CloudSync, Save
+    } from 'lucide-react';
+
+    const API_BASE = "https://jsonblob.com/api/jsonBlob";
+
+    const playSound = (type) => {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContextClass();
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        if (type === 'success') {
+          osc.frequency.setValueAtTime(500, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+          g.gain.setValueAtTime(0.1, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+          osc.start(); osc.stop(ctx.currentTime + 0.2);
+        } else {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(100, ctx.currentTime);
+          g.gain.setValueAtTime(0.1, ctx.currentTime);
+          osc.start(); osc.stop(ctx.currentTime + 0.3);
+        }
+      } catch(e) {}
+    };
+
+    const MemberManager = ({ members, setMembers, onClose }) => {
+      const [name, setName] = useState('');
+      const add = () => {
+        if(!name) return;
+        setMembers([...members, { id: Date.now(), name, penalties: 0 }]);
+        setName('');
+      };
+      return React.createElement('div', { className: "fixed inset-0 z-[110] glass flex flex-col p-6 pt-20 animate-in fade-in slide-in-from-right-4" },
+        React.createElement('div', { className: "max-w-md mx-auto w-full space-y-6" },
+          React.createElement('div', { className: "flex justify-between items-center" },
+            React.createElement('h2', { className: "text-2xl font-black italic uppercase" }, "战友名单"),
+            React.createElement('button', { onClick: onClose, className: "text-slate-500 font-black text-xs uppercase" }, "完成")
+          ),
+          React.createElement('div', { className: "flex gap-2" },
+            React.createElement('input', { type: "text", placeholder: "输入昵称...", value: name, onChange: e => setName(e.target.value), className: "flex-1 bg-black border border-white/10 rounded-2xl px-5 py-3.5 font-black outline-none focus:border-cyan-500" }),
+            React.createElement('button', { onClick: add, className: "bg-white text-black px-6 rounded-2xl font-black btn-active" }, React.createElement(Plus, { size: 20 }))
+          ),
+          React.createElement('div', { className: "space-y-2 max-h-[50vh] overflow-y-auto no-scrollbar" },
+            members.map(m => React.createElement('div', { key: m.id, className: "bg-white/5 p-4 rounded-2xl flex justify-between items-center border border-white/5" },
+              React.createElement('span', { className: "font-black" }, m.name),
+              React.createElement('div', { className: "flex gap-2" },
+                React.createElement('button', { onClick: () => {if(confirm('重置罚款？')) setMembers(members.map(x => x.id === m.id ? {...x, penalties: 0} : x))}, className: "p-2 text-slate-500 hover:text-white" }, React.createElement(Edit2, { size: 16 })),
+                React.createElement('button', { onClick: () => setMembers(members.filter(x => x.id !== m.id)) }, React.createElement(Trash2, { size: 16, className: "p-2 text-red-500/30 hover:text-red-500" }))
+              )
+            ))
+          )
+        )
+      );
+    };
+
+    const MissionForm = ({ members, onStart }) => {
+      const [game, setGame] = useState('英雄联盟');
+      const [amount, setAmount] = useState(10);
+      const [mins, setMins] = useState(10);
+      const [selected, setSelected] = useState([]);
+
+      return React.createElement('div', { className: "space-y-6" },
+        React.createElement('div', { className: "flex items-center gap-2 text-cyan-500 font-black text-[10px] uppercase tracking-widest mb-2" }, React.createElement(Timer, { size: 14 }), " 发起集结"),
+        React.createElement('div', { className: "space-y-4" },
+          React.createElement('input', { type: "text", placeholder: "集结游戏名称", value: game, onChange: e => setGame(e.target.value), className: "w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-3.5 text-sm font-black focus:border-cyan-500 outline-none" }),
+          React.createElement('div', { className: "grid grid-cols-2 gap-3" },
+            React.createElement('div', { className: "bg-black/40 border border-white/5 rounded-2xl flex items-center px-4" },
+              React.createElement('span', { className: "text-red-500 font-black mr-2" }, "¥"),
+              React.createElement('input', { type: "number", placeholder: "金额", value: amount, onChange: e => setAmount(Number(e.target.value)), className: "bg-transparent border-none w-full py-3.5 text-sm font-black focus:outline-none" })
+            ),
+            React.createElement('div', { className: "bg-black/40 border border-white/5 rounded-2xl flex items-center px-4" },
+              React.createElement(Clock, { size: 16, className: "text-amber-500 mr-2" }),
+              React.createElement('input', { type: "number", placeholder: "分钟", value: mins, onChange: e => setMins(Number(e.target.value)), className: "bg-transparent border-none w-full py-3.5 text-sm font-black focus:outline-none" })
+            )
+          ),
+          React.createElement('div', { className: "space-y-2" },
+            React.createElement('p', { className: "text-[8px] text-slate-500 font-black uppercase px-1" }, "谁必须来？"),
+            React.createElement('div', { className: "flex flex-wrap gap-2" },
+              members.map(m => React.createElement('button', { 
+                key: m.id, 
+                onClick: () => setSelected(prev => prev.includes(m.id) ? prev.filter(id => id !== m.id) : [...prev, m.id]),
+                className: `px-3 py-2 rounded-xl border text-[10px] font-black uppercase transition-all ${selected.includes(m.id) ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500' : 'bg-white/5 border-white/5 text-slate-500'}`
+              }, m.name))
+            )
+          ),
+          React.createElement('button', { onClick: () => onStart(game, amount, mins, selected), className: "w-full bg-cyan-500 text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest btn-active shadow-lg shadow-cyan-500/20" }, "开始集结监视")
+        )
+      );
+    };
+
+    const App = () => {
+      const [members, setMembers] = useState(() => JSON.parse(localStorage.getItem('squad_m') || '[]'));
+      const [activeMission, setActiveMission] = useState(() => JSON.parse(localStorage.getItem('squad_a') || 'null'));
+      const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('squad_h') || '[]'));
+      const [roomID, setRoomID] = useState(() => localStorage.getItem('squad_rid') || '');
+      const [isSyncing, setIsSyncing] = useState(false);
+      const [isManaging, setIsManaging] = useState(false);
+      const [isSettingRoom, setIsSettingRoom] = useState(false);
+      const [loadingAI, setLoadingAI] = useState(false);
+      const [timeLeft, setTimeLeft] = useState(0);
+
+      useEffect(() => {
+        localStorage.setItem('squad_m', JSON.stringify(members));
+        localStorage.setItem('squad_a', JSON.stringify(activeMission));
+        localStorage.setItem('squad_h', JSON.stringify(history));
+        localStorage.setItem('squad_rid', roomID);
+      }, [members, activeMission, history, roomID]);
+
+      useEffect(() => {
+        const rid = new URLSearchParams(window.location.search).get('room');
+        if (rid && rid !== roomID) {
+          if (confirm(`发现开黑房间：${rid}，是否加入同步？`)) {
+            setRoomID(rid);
+            fetchRoomData(rid);
+          }
+        }
+      }, []);
+
+      useEffect(() => {
+        if (!activeMission || activeMission.status !== 'waiting') return;
+        const timer = setInterval(() => {
+          const diff = Math.max(0, activeMission.endTime - Date.now());
+          setTimeLeft(diff);
+          if (diff <= 0) {
+            clearInterval(timer);
+            handleExpire();
+          }
+        }, 1000);
+        return () => clearInterval(timer);
+      }, [activeMission]);
+
+      const fetchRoomData = async (id) => {
+        if (!id) return;
+        setIsSyncing(true);
+        try {
+          const res = await fetch(`${API_BASE}/${id}`);
+          const data = await res.json();
+          if (data.members) setMembers(data.members);
+          if (data.history) setHistory(data.history);
+          if (data.activeMission) setActiveMission(data.activeMission);
+        } catch (e) { console.error(e); } finally { setIsSyncing(false); }
+      };
+
+      const pushRoomData = async () => {
+        if (!roomID) return;
+        setIsSyncing(true);
+        try {
+          await fetch(`${API_BASE}/${roomID}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ members, history, activeMission })
+          });
+        } catch (e) { alert("推送失败"); } finally { setIsSyncing(false); }
+      };
+
+      const createRoom = async () => {
+        setIsSyncing(true);
+        try {
+          const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ members, history, activeMission })
+          });
+          const location = res.headers.get("Location");
+          const id = location.split("/").pop();
+          setRoomID(id);
+          alert(`房间创建成功！ID: ${id}`);
+        } catch (e) { alert("创建失败"); } finally { setIsSyncing(false); }
+      };
+
+      const handleExpire = async () => {
+        setLoadingAI(true);
+        const lates = activeMission.participants.filter(p => !p.checked);
+        const newHistory = [...history];
+        const newMembers = [...members];
+        for (const p of lates) {
+          const m = newMembers.find(x => x.id === p.id);
+          if (!m) continue;
+          m.penalties += activeMission.amount;
+          newHistory.unshift({
+            id: Date.now() + Math.random(),
+            name: m.name,
+            amount: activeMission.amount,
+            game: activeMission.game,
+            time: new Date().toLocaleTimeString(),
+            roast: "这人纯纯的小狗逼，集结都能迟到。"
+          });
+        }
+        setMembers(newMembers);
+        setHistory(newHistory);
+        setActiveMission(null);
+        setLoadingAI(false);
+        playSound('alert');
+        if(roomID) pushRoomData();
+      };
+
+      const startMission = (game, amount, minutes, selectedIds) => {
+        const mission = {
+          game, amount, 
+          endTime: Date.now() + minutes * 60000,
+          status: 'waiting',
+          participants: selectedIds.map(id => ({ id, checked: false }))
+        };
+        setActiveMission(mission);
+        if(roomID) pushRoomData();
+      };
+
+      const toggleCheck = (id) => {
+        const next = { ...activeMission };
+        const p = next.participants.find(x => x.id === id);
+        if (p) p.checked = !p.checked;
+        setActiveMission(next);
+        playSound('success');
+      };
+
+      const copyShareLink = () => {
+        const url = `${window.location.origin}${window.location.pathname}?room=${roomID}`;
+        navigator.clipboard.writeText(url);
+        alert("分享链接已复制！");
+      };
+
+      return React.createElement('div', { className: "flex-1 flex flex-col w-full h-full bg-black" },
+        React.createElement('header', { className: "px-6 pt-12 pb-4 glass shrink-0 flex justify-between items-end safe-top" },
+          React.createElement('div', { className: "flex items-center gap-3" },
+            React.createElement('div', { className: "bg-cyan-500 p-2 rounded-lg animate-pulse-cyan" }, React.createElement(Zap, { className: "text-black", size: 20 })),
+            React.createElement('div', null,
+              React.createElement('h1', { className: "text-xl font-black italic tracking-tighter uppercase leading-none" }, "准时保 · 在线版"),
+              React.createElement('div', { className: "flex items-center gap-1 mt-1" },
+                React.createElement('div', { className: `w-1.5 h-1.5 rounded-full ${roomID ? 'bg-emerald-500' : 'bg-slate-600'}` }),
+                React.createElement('span', { className: "text-[8px] text-slate-500 font-bold uppercase tracking-widest" }, roomID ? `ROOM: ${roomID}` : 'OFFLINE MODE')
+              )
+            )
+          ),
+          React.createElement('div', { className: "flex gap-2" },
+            roomID && React.createElement('button', { onClick: () => fetchRoomData(roomID), className: `p-2 rounded-lg bg-white/5 btn-active ${isSyncing ? 'animate-spin text-cyan-500' : 'text-slate-400'}` }, React.createElement(CloudSync, { size: 20 })),
+            React.createElement('button', { onClick: () => setIsSettingRoom(true), className: "p-2 rounded-lg bg-white/5 text-slate-400 btn-active" }, React.createElement(Globe, { size: 20 }))
+          )
+        ),
+        React.createElement('main', { className: "flex-1 overflow-y-auto no-scrollbar p-4 space-y-6" },
+          React.createElement('div', { className: "max-w-md mx-auto space-y-6 pb-24" },
+            React.createElement('section', { className: "glass rounded-[2rem] p-6" },
+              !activeMission ? React.createElement(MissionForm, { members, onStart: startMission }) : React.createElement('div', { className: "space-y-6" },
+                React.createElement('div', { className: "flex justify-between items-center" },
+                  React.createElement('div', null,
+                    React.createElement('p', { className: "text-cyan-500 text-[10px] font-black uppercase tracking-widest" }, activeMission.game),
+                    React.createElement('h3', { className: "text-xl font-black italic uppercase" }, "集结倒计时")
+                  ),
+                  React.createElement('div', { className: "text-3xl font-mono font-black text-white tabular-nums" }, `${Math.floor(timeLeft / 60000)}:${String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0')}`)
+                ),
+                React.createElement('div', { className: "space-y-3" },
+                  activeMission.participants.map(p => {
+                    const m = members.find(x => x.id === p.id);
+                    return React.createElement('div', { key: p.id, className: `flex items-center justify-between p-4 rounded-2xl border transition-all ${p.checked ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/5'}` },
+                      React.createElement('span', { className: `font-black ${p.checked ? 'text-emerald-500' : 'text-white'}` }, m?.name),
+                      !p.checked ? React.createElement('button', { onClick: () => toggleCheck(p.id), className: "bg-white text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase btn-active" }, "我上线了") : React.createElement(CheckCircle2, { className: "text-emerald-500", size: 24 })
+                    );
+                  })
+                ),
+                React.createElement('div', { className: "flex gap-2" },
+                  React.createElement('button', { onClick: () => {if(roomID) pushRoomData(); alert('已同步');}, className: "flex-1 py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase text-slate-500 border border-white/5 btn-active" }, "同步进度"),
+                  React.createElement('button', { onClick: () => setActiveMission(null), className: "flex-1 py-3 bg-red-500/10 rounded-xl text-[10px] font-black uppercase text-red-500 border border-red-500/10 btn-active" }, "终止集结")
+                )
+              )
+            ),
+            React.createElement('section', { className: "space-y-4" },
+              React.createElement('div', { className: "flex justify-between items-center px-2" },
+                React.createElement('h4', { className: "text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-2" }, React.createElement(Skull, { size: 14 }), " 鸽子身价榜"),
+                React.createElement('button', { onClick: () => setIsManaging(true), className: "text-[8px] text-slate-500 font-black uppercase border-b border-slate-800" }, "管理成员")
+              ),
+              React.createElement('div', { className: "space-y-2" },
+                members.sort((a,b) => b.penalties - a.penalties).map((m, i) => React.createElement('div', { key: m.id, className: "glass p-4 rounded-2xl flex justify-between items-center" },
+                  React.createElement('div', { className: "flex items-center gap-3" },
+                    React.createElement('span', { className: `w-5 h-5 flex items-center justify-center rounded text-[10px] font-black ${i===0 && m.penalties > 0 ? 'bg-red-500 text-white' : 'bg-white/5 text-slate-500'}` }, i+1),
+                    React.createElement('span', { className: "font-black" }, m.name)
+                  ),
+                  React.createElement('span', { className: `font-mono font-black ${m.penalties > 0 ? 'text-red-500' : 'text-slate-700'}` }, `¥${m.penalties}`)
+                )),
+                members.length === 0 && React.createElement('div', { className: "text-center py-8 text-slate-800 font-black uppercase text-xs" }, "暂无成员")
+              )
+            ),
+            React.createElement('section', { className: "space-y-4" },
+              React.createElement('h4', { className: "text-[10px] font-black text-slate-600 uppercase tracking-widest px-2 flex items-center gap-2" }, React.createElement(History, { size: 14 }), " 处决动态"),
+              React.createElement('div', { className: "space-y-3" },
+                history.slice(0, 5).map(h => React.createElement('div', { key: h.id, className: "glass p-4 rounded-2xl space-y-2" },
+                  React.createElement('div', { className: "flex justify-between items-center" },
+                    React.createElement('span', { className: "text-xs font-black uppercase" }, h.name),
+                    React.createElement('span', { className: "text-red-500 font-black text-xs" }, `-¥${h.amount}`)
+                  ),
+                  React.createElement('p', { className: "text-[10px] text-slate-400 italic font-medium leading-relaxed" }, `"${h.roast}"`),
+                  React.createElement('div', { className: "flex justify-between text-[8px] font-black text-slate-700 uppercase" },
+                    React.createElement('span', null, h.game), React.createElement('span', null, h.time)
+                  )
+                ))
+              )
+            )
+          )
+        ),
+        React.createElement('nav', { className: "shrink-0 glass border-t border-white/5 px-8 pt-4 pb-12 flex justify-around items-center safe-bottom" },
+          React.createElement('button', { onClick: () => setIsManaging(true), className: "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-500 transition-colors" }, React.createElement(Users, { size: 20 }), React.createElement('span', { className: "text-[8px] font-black uppercase" }, "名单")),
+          React.createElement('div', { className: "relative -mt-12" },
+            React.createElement('button', { onClick: roomID ? copyShareLink : () => setIsSettingRoom(true), className: "bg-white text-black p-4 rounded-full shadow-xl btn-active" }, React.createElement(Share2, { size: 24 }))
+          ),
+          React.createElement('button', { onClick: () => setIsSettingRoom(true), className: "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-500 transition-colors" }, React.createElement(Globe, { size: 20 }), React.createElement('span', { className: "text-[8px] font-black uppercase" }, "房间"))
+        ),
+        isManaging && React.createElement(MemberManager, { members, setMembers, onClose: () => setIsManaging(false) }),
+        isSettingRoom && React.createElement('div', { className: "fixed inset-0 z-[100] glass flex flex-col p-6 pt-20 animate-in fade-in slide-in-from-bottom-4" },
+          React.createElement('div', { className: "max-w-md mx-auto w-full space-y-8" },
+            React.createElement('div', { className: "flex justify-between items-center" },
+              React.createElement('h2', { className: "text-2xl font-black italic uppercase" }, "开黑房间设置"),
+              React.createElement('button', { onClick: () => setIsSettingRoom(false), className: "text-slate-500 font-black text-xs uppercase" }, "关闭")
+            ),
+            React.createElement('div', { className: "bg-white/5 p-6 rounded-[2rem] border border-white/5 space-y-6" },
+              React.createElement('div', { className: "space-y-2" },
+                React.createElement('label', { className: "text-[10px] font-black text-slate-500 uppercase px-1" }, "当前房间号"),
+                React.createElement('div', { className: "flex gap-2" },
+                  React.createElement('input', { type: "text", value: roomID, onChange: e => setRoomID(e.target.value), placeholder: "输入 ID 加入", className: "flex-1 bg-black border border-white/10 rounded-xl px-4 py-3 font-mono font-black text-cyan-500 outline-none" }),
+                  roomID && React.createElement('button', { onClick: () => fetchRoomData(roomID), className: "bg-white text-black px-4 rounded-xl font-black text-[10px] uppercase btn-active" }, "拉取")
+                )
+              ),
+              React.createElement('div', { className: "grid grid-cols-2 gap-3" },
+                React.createElement('button', { onClick: createRoom, className: "bg-cyan-500 text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest btn-active" }, "创建新房间"),
+                React.createElement('button', { onClick: pushRoomData, disabled: !roomID, className: "bg-white/10 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest btn-active disabled:opacity-30" }, "推送数据")
+              ),
+              roomID && React.createElement('button', { onClick: copyShareLink, className: "w-full py-4 border border-cyan-500/30 text-cyan-500 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 btn-active" }, React.createElement(Share2, { size: 14 }), " 分享房间链接")
+            )
+          )
+        ),
+        loadingAI && React.createElement('div', { className: "fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center gap-4" },
+          React.createElement(Sparkles, { className: "text-cyan-500 animate-bounce", size: 48 }),
+          React.createElement('span', { className: "text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 animate-pulse" }, "正在处决迟到者...")
+        )
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = createRoot(container);
+    root.render(React.createElement(App));
+  </script>
 </body>
 </html>
